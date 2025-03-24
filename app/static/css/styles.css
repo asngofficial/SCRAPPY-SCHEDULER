@@ -1,0 +1,229 @@
+/* Add font files for Outfit */
+@font-face {
+  font-family: 'Outfit';
+  src: url('fonts/outfit.woff2') format('woff2'),
+       url('fonts/outfit.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+:root {
+  --font-family-outfit: 'Outfit', sans-serif;
+}
+
+
+/* CSS Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.rectangle-56-2 {
+  position: absolute;
+  left: -5px;
+  top: 0px;
+  width: 1445px;
+  height: 1052px;
+  background-color: rgba(119, 215, 119, 1);
+}
+
+.ellipse-7-3 {
+  position: absolute;
+  left: -203px;
+  top: 872px;
+  width: 722px;
+  height: 675px;
+  opacity: 0.47999998927116394;
+}
+
+.text-4 {
+  position: absolute;
+  left: 212.01611328125px;
+  top: 1129px;
+  width: 532px;
+  height: 51.90207290649414px;
+  font-size: 60px;
+  font-family: var(--font-family-outfit);
+  font-weight: bold;
+  line-height: 79px;
+  text-align: left;
+  color: rgba(255, 255, 255, 1);
+}
+
+.ellipse-8-5 {
+  position: absolute;
+  left: 840px;
+  top: 412px;
+  width: 964px;
+  height: 961px;
+  opacity: 0.47999998927116394;
+}
+
+.rectangle-1-7 {
+  position: absolute;
+  left: 270px;
+  top: 734px;
+  width: 313px;
+  height: 83px;
+  background-color: rgba(0, 133, 62, 1);
+  border-radius: 88px;
+}
+
+.text-8 {
+  position: absolute;
+  left: 331px;
+  top: 758px;
+  width: 196px;
+  height: 37px;
+  font-size: 29px;
+  font-family: var(--font-family-outfit);
+  font-weight: bold;
+  text-align: center;
+  color: rgba(255, 255, 255, 1);
+}
+
+.image-2-10 {
+  position: absolute;
+  left: 956.1989135742188px;
+  top: 269px;
+  width: 288.80108642578125px;
+  height: 321.7620849609375px;
+  width: 100%;
+  height: auto;
+}
+
+.text-11 {
+  position: absolute;
+  left: 270px;
+  top: 580.2390747070312px;
+  width: 360px;
+  height: 64.76092529296875px;
+  font-size: 18px;
+  font-family: var(--font-family-outfit);
+  font-weight: bold;
+  text-align: left;
+  color: rgba(255, 255, 255, 1);
+}
+
+.main-9 {
+  position: absolute;
+  left: 270px;
+  top: 269px;
+  width: 975px;
+  height: 376px;
+}
+
+.main-6 {
+  position: absolute;
+  left: 270px;
+  top: 269px;
+  width: 975px;
+  height: 548px;
+}
+
+.ellipse-2-12 {
+  position: absolute;
+  left: -292px;
+  top: 139px;
+  width: 584px;
+  height: 595px;
+  opacity: 0.47999998927116394;
+}
+
+.rectangle-1-14 {
+  position: absolute;
+  left: 270px;
+  top: 734px;
+  width: 313px;
+  height: 83px;
+  background-color: rgba(0, 133, 62, 1);
+  border-radius: 88px;
+}
+
+.text-15 {
+  position: absolute;
+  left: 331px;
+  top: 758px;
+  width: 196px;
+  height: 37px;
+  font-size: 29px;
+  font-family: var(--font-family-outfit);
+  font-weight: bold;
+  text-align: center;
+  color: rgba(255, 255, 255, 1);
+}
+
+.image-2-17 {
+  position: absolute;
+  left: 956.1989135742188px;
+  top: 269px;
+  width: 288.80108642578125px;
+  height: 321.7620849609375px;
+  width: 100%;
+  height: auto;
+}
+
+.text-18 {
+  position: absolute;
+  left: 270px;
+  top: 580.2390747070312px;
+  width: 360px;
+  height: 64.76092529296875px;
+  font-size: 18px;
+  font-family: var(--font-family-outfit);
+  font-weight: bold;
+  text-align: left;
+  color: rgba(255, 255, 255, 1);
+}
+
+.main-16 {
+  position: absolute;
+  left: 270px;
+  top: 269px;
+  width: 975px;
+  height: 376px;
+}
+
+.main-13 {
+  position: absolute;
+  left: 270px;
+  top: 269px;
+  width: 975px;
+  height: 548px;
+}
+
+.text-19 {
+  position: absolute;
+  left: 284px;
+  top: 38px;
+  width: 1065px;
+  height: 35px;
+  font-size: 18px;
+  text-align: left;
+  color: rgba(255, 255, 255, 1);
+}
+
+.text-20 {
+  position: absolute;
+  left: 224px;
+  top: 248px;
+  width: 616px;
+  height: 309px;
+  font-size: 96px;
+  font-family: var(--font-family-outfit);
+  font-weight: bold;
+  line-height: 100px;
+  text-align: left;
+  color: rgba(255, 255, 255, 1);
+}
+
+.frame-1-1 {
+  position: absolute;
+  left: 707px;
+  top: -1391px;
+  width: 1440px;
+  height: 1052px;
+  position: relative;
+  width: 100%;
+  height: auto;
+}
