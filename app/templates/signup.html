@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+{% block title %}Sign Up - Scrappy Scheduler{% endblock %}
+
+{% block extra_css %}
+<style>
+    .password-strength {
+        height: 4px;
+        margin-top: 0.25rem;
+        background-color: #e9ecef;
+        border-radius: 2px;
+        overflow: hidden;
+    }
+    .password-strength-bar {
+        height: 100%;
+        width: 0%;
+        transition: width 0.3s ease, background-color 0.3s ease;
+    }
+    .password-requirements {
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+    }
+    .requirement {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.25rem;
+        color: #6c757d;
+    }
+    .requirement i {
+        margin-right: 0.5rem;
+        font-size: 0.75rem;
+    }
+    .requirement.valid {
+        color: #198754;
+    }
+    .form-control.is-invalid {
+        background-image: none;
+        padding-right: 0.75rem;
+    }
+    .form-control.is-valid {
+        background-image: none;
+        padding-right: 0.75rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-body p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <i class="bi bi-calendar-plus fs-1 text-primary"></i>
+                    <h2 class="mt-3">Create Your Account</h2>
+                    <p class="text-muted">Join Scrappy Scheduler to manage your tasks efficiently</p>
+                </div>
+                
+                <form method="POST" action="{{ url_for('auth.register') }}" novalidate>
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.first_name.label(class="form-label") }}
+                            {{ form.first_name(class="form-control" + (" is-invalid" if form.first_name.errors else "")) }}
+                            {% for error in form.first_name.errors %}
+                            <div class="invalid-feedback d-flex align-items-center">
+                                <i class="bi bi-exclamation-circle me-2"></i>{{ error }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            {{ form.last_name.label(class="form-label") }}
+                            {{ form.last_name(class="form-control" + (" is-invalid" if form.last_name.errors else "")) }}
+                            {% for error in form.last_name.errors %}
+                            <div class="invalid-feedback d-flex align-items-center">
+                                <i class="bi bi-exclamation-circle me-2"></i>{{ error }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.username.label(class="form-label") }}
+                        <div class="input-group">
+                            <span class="input-group-text">@</span>
+                            {{ form.username(class="form-control" + (" is-invalid" if form.username.errors else ""), 
+                                          placeholder="username") }}
+                        </div>
+                        {% for error in form.username.errors %}
+                        <div class="invalid-feedback d-flex align-items-center">
+                            <i class="bi bi-exclamation-circle me-2"></i>{{ error }}
+                        </div>
+                        {% endfor %}
+                        <small class="form-text text-muted">Letters, numbers and underscores only</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.email.label(class="form-label") }}
+                        {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), 
+                                    placeholder="example@domain.com") }}
+                        {% for error in form.email.errors %}
+                        <div class="invalid-feedback d-flex align-items-center">
+                            <i class="bi bi-exclamation-circle me-2"></i>{{ error }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.password.label(class="form-label") }}
+                        {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""), 
+                                       id="passwordField",
+                                       oninput="checkPasswordStrength(this.value)") }}
+                        <div class="password-strength mt-1">
+                            <div class="password-strength-bar" id="passwordStrengthBar"></div>
+                        </div>
+                        <div class="password-requirements">
+                            <div class="requirement" id="lengthReq">
+                                <i class="bi bi-circle"></i>
+                                <span>At least 8 characters</span>
+                            </div>
+                            <div class="requirement" id="uppercaseReq">
+                                <i class="bi bi-circle"></i>
+                                <span>At least 1 uppercase letter</span>
+                            </div>
+                            <div class="requirement" id="numberReq">
+                                <i class="bi bi-circle"></i>
+                                <span>At least 1 number</span>
+                            </div>
+                            <div class="requirement" id="specialReq">
+                                <i class="bi bi-circle"></i>
+                                <span>At least 1 special character</span>
+                            </div>
+                        </div>
+                        {% for error in form.password.errors %}
+                        <div class="invalid-feedback d-flex align-items-center">
+                            <i class="bi bi-exclamation-circle me-2"></i>{{ error }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="mb-4">
+                        {{ form.confirm_password.label(class="form-label") }}
+                        {{ form.confirm_password(class="form-control" + (" is-invalid" if form.confirm_password.errors else ""), 
+                                               id="confirmPasswordField",
+                                               oninput="checkPasswordMatch()") }}
+                        <div class="valid-feedback d-flex align-items-center" id="passwordMatchFeedback" style="display: none!important;">
+                            <i class="bi bi-check-circle me-2"></i>Passwords match
+                        </div>
+                        {% for error in form.confirm_password.errors %}
+                        <div class="invalid-feedback d-flex align-items-center">
+                            <i class="bi bi-exclamation-circle me-2"></i>{{ error }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="termsCheck" required>
+                        <label class="form-check-label" for="termsCheck">
+                            I agree to the <a href="{{ url_for('main.terms') }}" class="text-decoration-none">Terms of Service</a> and 
+                            <a href="{{ url_for('main.privacy') }}" class="text-decoration-none">Privacy Policy</a>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100 py-2 mb-3" id="submitButton">
+                        <i class="bi bi-person-plus me-2"></i>Create Account
+                    </button>
+                    
+                    <div class="text-center">
+                        <p class="mb-0">Already have an account? 
+                            <a href="{{ url_for('auth.login') }}" class="text-decoration-none fw-semibold">Sign In</a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function checkPasswordStrength(password) {
+        // Strength calculation
+        let strength = 0;
+        const requirements = {
+            length: password.length >= 8,
+            uppercase: /[A-Z]/.test(password),
+            number: /[0-9]/.test(password),
+            special: /[^A-Za-z0-9]/.test(password)
+        };
+        
+        // Update requirement indicators
+        document.getElementById('lengthReq').classList.toggle('valid', requirements.length);
+        document.getElementById('uppercaseReq').classList.toggle('valid', requirements.uppercase);
+        document.getElementById('numberReq').classList.toggle('valid', requirements.number);
+        document.getElementById('specialReq').classlist.toggle('valid', requirements.special);
+        
+        // Calculate strength score
+        if (requirements.length) strength += 25;
+        if (requirements.uppercase) strength += 25;
+        if (requirements.number) strength += 25;
+        if (requirements.special) strength += 25;
+        
+        // Update strength bar
+        const strengthBar = document.getElementById('passwordStrengthBar');
+        strengthBar.style.width = strength + '%';
+        
+        // Update color based on strength
+        if (strength < 50) {
+            strengthBar.style.backgroundColor = '#dc3545'; // Red
+        } else if (strength < 75) {
+            strengthBar.style.backgroundColor = '#fd7e14'; // Orange
+        } else {
+            strengthBar.style.backgroundColor = '#198754'; // Green
+        }
+        
+        // Enable/disable submit button based on strength
+        document.getElementById('submitButton').disabled = strength < 75;
+    }
+    
+    function checkPasswordMatch() {
+        const password = document.getElementById('passwordField').value;
+        const confirmPassword = document.getElementById('confirmPasswordField').value;
+        const feedback = document.getElementById('passwordMatchFeedback');
+        
+        if (password && confirmPassword) {
+            if (password === confirmPassword) {
+                document.getElementById('confirmPasswordField').classList.add('is-valid');
+                document.getElementById('confirmPasswordField').classList.remove('is-invalid');
+                feedback.style.display = 'flex';
+            } else {
+                document.getElementById('confirmPasswordField').classList.add('is-invalid');
+                document.getElementById('confirmPasswordField').classList.remove('is-valid');
+                feedback.style.display = 'none';
+            }
+        }
+    }
+</script>
+{% endblock %}

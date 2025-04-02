@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% block title %}Sign In - Scrappy Scheduler{% endblock %}
+
+{% block extra_css %}
+<style>
+    .login-card {
+        max-width: 450px;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: none;
+    }
+    .login-header {
+        background-color: var(--bs-primary);
+        color: white;
+        padding: 1.5rem;
+        text-align: center;
+    }
+    .login-body {
+        padding: 2rem;
+    }
+    .form-control {
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+    }
+    .btn-login {
+        padding: 0.75rem;
+        border-radius: 8px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+    .divider {
+        display: flex;
+        align-items: center;
+        margin: 1.5rem 0;
+        color: var(--bs-secondary);
+    }
+    .divider::before,
+    .divider::after {
+        content: "";
+        flex: 1;
+        border-bottom: 1px solid var(--bs-border-color);
+    }
+    .divider::before {
+        margin-right: 1rem;
+    }
+    .divider::after {
+        margin-left: 1rem;
+    }
+    .social-login .btn {
+        padding: 0.5rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+    }
+    .password-toggle {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        z-index: 5;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card login-card">
+                <div class="login-header">
+                    <i class="bi bi-calendar-week fs-1"></i>
+                    <h2 class="mt-3 mb-0">Welcome Back</h2>
+                </div>
+                
+                <div class="login-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                <i class="bi bi-{% if category == 'success' %}check-circle{% else %}exclamation-triangle{% endif %}-fill me-2"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form method="POST" action="{{ url_for('auth.login') }}" novalidate>
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-4">
+                            {{ form.email.label(class="form-label fw-semibold") }}
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">
+                                    <i class="bi bi-envelope-fill text-secondary"></i>
+                                </span>
+                                {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), 
+                                            placeholder="your@email.com") }}
+                            </div>
+                            {% for error in form.email.errors %}
+                            <div class="invalid-feedback d-flex align-items-start">
+                                <i class="bi bi-exclamation-circle-fill me-2 mt-1"></i>
+                                <span>{{ error }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="mb-4 position-relative">
+                            {{ form.password.label(class="form-label fw-semibold") }}
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">
+                                    <i class="bi bi-lock-fill text-secondary"></i>
+                                </span>
+                                {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""), 
+                                               placeholder="••••••••",
+                                               id="passwordField") }}
+                                <span class="password-toggle" onclick="togglePasswordVisibility()">
+                                    <i class="bi bi-eye-fill" id="toggleIcon"></i>
+                                </span>
+                            </div>
+                            {% for error in form.password.errors %}
+                            <div class="invalid-feedback d-flex align-items-start">
+                                <i class="bi bi-exclamation-circle-fill me-2 mt-1"></i>
+                                <span>{{ error }}</span>
+                            </div>
+                            {% endfor %}
+                            <div class="text-end mt-2">
+                                <a href="{{ url_for('auth.forgot_password') }}" class="text-decoration-none small">
+                                    Forgot Password?
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4 form-check">
+                            {{ form.remember(class="form-check-input") }}
+                            {{ form.remember.label(class="form-check-label") }}
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100 btn-login mb-4">
+                            <i class="bi bi-box-arrow-in-right me-2"></i> Sign In
+                        </button>
+                        
+                        <div class="divider">
+                            <span class="text-muted">or continue with</span>
+                        </div>
+                                              
+                        <div class="text-center">
+                            <p class="mb-0">Don't have an account? 
+                                <a href="{{ url_for('auth.register') }}" class="text-decoration-none fw-semibold">
+                                    Sign up here
+                                </a>
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function togglePasswordVisibility() {
+        const passwordField = document.getElementById('passwordField');
+        const toggleIcon = document.getElementById('toggleIcon');
+        
+        if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+            toggleIcon.classList.remove('bi-eye-fill');
+            toggleIcon.classList.add('bi-eye-slash-fill');
+        } else {
+            passwordField.type = 'password';
+            toggleIcon.classList.remove('bi-eye-slash-fill');
+            toggleIcon.classList.add('bi-eye-fill');
+        }
+    }
+</script>
+{% endblock %}
