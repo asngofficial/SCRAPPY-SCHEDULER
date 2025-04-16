@@ -9,18 +9,18 @@ from app.home.forms import TaskForm  # Add this import
 
 home = Blueprint("home", __name__)
 
-def validate_task_input(task_name, assigned_date_str, due_date_str):
+def validate_task_input(task_name, start_date_str, due_date_str):
     """Validate and sanitize task input data"""
-    if not all([task_name, assigned_date_str, due_date_str]):
+    if not all([task_name, start_date_str, due_date_str]):
         raise ValueError("All fields are required")
     
     try:
-        assigned_date = datetime.strptime(assigned_date_str, "%Y-%m-%dT%H:%M")
+        start_date = datetime.strptime(start_date_str, "%Y-%m-%dT%H:%M")
         due_date = datetime.strptime(due_date_str, "%Y-%m-%dT%H:%M")
     except ValueError:
         raise ValueError("Invalid date format")
     
-    if assigned_date > due_date:
+    if start_date > due_date:
         raise ValueError("Assigned date cannot be after due date")
     
     # Sanitize task name
@@ -28,7 +28,7 @@ def validate_task_input(task_name, assigned_date_str, due_date_str):
     if not sanitized_task_name:
         raise ValueError("Task name cannot be empty")
     
-    return sanitized_task_name, assigned_date, due_date
+    return sanitized_task_name, start_date, due_date
 
 @home.route("/")
 @login_required
@@ -42,38 +42,39 @@ def index():
         flash("Error loading tasks. Please try again.", "error")
         return render_template("index.html", tasks=[])
 
-@home.route("/add", methods=["POST"])
+@home.route("/add-task", methods=["POST"])
 @login_required
 def add_task():
+    print("Add task endpoint hit")  # Debug
+    form = TaskForm()
+    
+    if not form.validate_on_submit():
+        print("Form validation failed:", form.errors)  # Debug
+        return jsonify({
+            "success": False,
+            "errors": form.errors
+        }), 400
+
     try:
-        task_name = request.form.get("task_name", "")
-        assigned_date_str = request.form.get("assigned_date")
-        due_date_str = request.form.get("due_date")
-
-        sanitized_name, assigned_date, due_date = validate_task_input(
-            task_name, assigned_date_str, due_date_str
-        )
-
-        new_task = Task(
-            task_name=sanitized_name,
-            assigned_date=assigned_date,
-            due_date=due_date,
+        print("Creating task...")  # Debug
+        task = Task(
+            task_name=form.task_name.data,
+            start_date=form.start_date.data,
+            due_date=form.due_date.data,
             user_id=current_user.id
         )
-        
-        db.session.add(new_task)
+        db.session.add(task)
         db.session.commit()
-        flash("Task added successfully", "success")
-
-    except ValueError as e:
-        flash(str(e), "error")
-    except SQLAlchemyError:
+        print("Task saved successfully")  # Debug
+        return jsonify({"success": True})
+        
+    except Exception as e:
         db.session.rollback()
-        flash("Error saving task to database", "error")
-    except BadRequest:
-        flash("Invalid request data", "error")
-    
-    return redirect(url_for("home.index"))
+        print("Error saving task:", str(e))  # Debug
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
 
 @home.route("/delete/<int:task_id>", methods=["POST"])
 @login_required
@@ -95,15 +96,15 @@ def update_task(task_id):
     try:
         task = Task.query.filter_by(id=task_id, user_id=current_user.id).first_or_404()
         task_name = request.form.get("task_name", "")
-        assigned_date_str = request.form.get("assigned_date")
+        start_date_str = request.form.get("start_date")
         due_date_str = request.form.get("due_date")
 
-        sanitized_name, assigned_date, due_date = validate_task_input(
-            task_name, assigned_date_str, due_date_str
+        sanitized_name, start_date, due_date = validate_task_input(
+            task_name, start_date_str, due_date_str
         )
 
         task.task_name = sanitized_name
-        task.assigned_date = assigned_date
+        task.start_date = start_date
         task.due_date = due_date
         
         db.session.commit()

@@ -10,29 +10,36 @@
         gap: 20px;
         height: calc(100vh - 150px);
     }
+
     .task-list {
         overflow-y: auto;
         padding-right: 10px;
     }
+
     .task-item {
         transition: all 0.2s;
     }
-    .task-item:hover {
-        background-color: #f8f9fa;
-        transform: translateY(-2px);
-    }
+
+        .task-item:hover {
+            background-color: #f8f9fa;
+            transform: translateY(-2px);
+        }
+
     .completed-task {
         opacity: 0.7;
     }
+
     .fc-event {
         cursor: pointer;
         padding: 2px 4px;
     }
+
     @media (max-width: 992px) {
         .dashboard-container {
             grid-template-columns: 1fr;
             height: auto;
         }
+
         .task-list {
             height: 400px;
         }
@@ -50,13 +57,13 @@
                 <i class="bi bi-plus"></i> Add Task
             </button>
         </div>
-        
+
         <div class="list-group">
             {% for task in tasks %}
             <div class="list-group-item task-item d-flex justify-content-between align-items-center {% if task.is_completed %}completed-task{% endif %}"
                  data-task-id="{{ task.id }}">
                 <div class="d-flex align-items-center">
-                    <input class="form-check-input me-2" type="checkbox" 
+                    <input class="form-check-input me-2" type="checkbox"
                            {% if task.is_completed %}checked{% endif %}
                            onchange="toggleTaskComplete(this, {{ task.id }})">
                     <div>
@@ -95,51 +102,52 @@
                 <h5 class="modal-title" id="modalTitle">Add Task</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-<form id="taskForm" method="POST" action="{{ url_for('home.add_task') }}">
-    {{ form.hidden_tag() }}
-    <div class="modal-body">
-        <input type="hidden" name="task_id" id="formTaskId" value="">
-        <div class="mb-3">
-            {{ form.task_name.label(class="form-label") }}
-            {{ form.task_name(class="form-control") }}
-            {% if form.task_name.errors %}
-                <div class="invalid-feedback d-block">
-                    {% for error in form.task_name.errors %}
-                        {{ error }}
-                    {% endfor %}
+            <form id="taskForm" method="POST" action="{{ url_for('home.add_task') }}" data-default-action="{{ url_for('home.add_task') }}">
+                {{ form.hidden_tag() }}
+                <div id="error-message" class="alert alert-danger d-none mb-3"></div>
+                <div class="modal-body">
+                    <input type="hidden" name="task_id" id="formTaskId" value="">
+                    <div class="mb-3">
+                        {{ form.task_name.label(class="form-label") }}
+                        {{ form.task_name(class="form-control", id="task_name") }}
+                        {% if form.task_name.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.task_name.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            {{ form.start_date.label(class="form-label") }}
+                            {{ form.start_date(class="form-control", id="start_date") }}
+                            {% if form.start_date.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.start_date.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.due_date.label(class="form-label") }}
+                            {{ form.due_date(class="form-control", id="due_date") }}
+                            {% if form.due_date.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.due_date.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
-            {% endif %}
-        </div>
-        <div class="row g-3">
-            <div class="col-md-6">
-                {{ form.start_date.label(class="form-label") }}
-                {{ form.start_date(class="form-control") }}
-                {% if form.start_date.errors %}
-                    <div class="invalid-feedback d-block">
-                        {% for error in form.start_date.errors %}
-                            {{ error }}
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            </div>
-            <div class="col-md-6">
-                {{ form.due_date.label(class="form-label") }}
-                {{ form.due_date(class="form-control") }}
-                {% if form.due_date.errors %}
-                    <div class="invalid-feedback d-block">
-                        {% for error in form.due_date.errors %}
-                            {{ error }}
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        {{ form.submit(class="btn btn-primary") }}  <!-- This is the submit button -->
-    </div>
-</form>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    {{ form.submit(class="btn btn-primary") }}
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -197,12 +205,54 @@
         });
         calendar.render();
 
-        // Set current datetime for new tasks
-        const now = new Date();
-        const timezoneOffset = now.getTimezoneOffset() * 60000;
-        const localISOTime = (new Date(now - timezoneOffset)).toISOString().slice(0, 16);
-        document.getElementById('startDate').value = localISOTime;
-        document.getElementById('dueDate').value = localISOTime;
+        // Set up modal event listener for setting default dates
+        const taskModal = document.getElementById('taskModal');
+        taskModal.addEventListener('show.bs.modal', function() {
+            // Only set defaults when adding new task (not when editing)
+            if (!document.getElementById('formTaskId').value) {
+                const now = new Date();
+                const timezoneOffset = now.getTimezoneOffset() * 60000;
+                const localISOTime = (new Date(now - timezoneOffset)).toISOString().slice(0, 16);
+
+                const startDateField = document.getElementById('start_date');
+                const dueDateField = document.getElementById('due_date');
+
+                if (startDateField && dueDateField) {
+                    startDateField.value = localISOTime;
+                    dueDateField.value = localISOTime;
+                }
+            }
+        });
+
+        // Form submission handler
+        document.getElementById('taskForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            try {
+                const response = await fetch(this.action, {
+                    method: 'POST',
+                    body: new FormData(this),
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name="csrf_token"]').value
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    window.location.reload();
+                } else {
+                    const errorDiv = document.getElementById('error-message');
+                    errorDiv.textContent = result.error || Object.values(result.errors).join('\n');
+                    errorDiv.classList.remove('d-none');
+                    errorDiv.scrollIntoView({ behavior: 'smooth' });
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to submit form');
+            }
+        });
     });
 
     function toggleTaskComplete(checkbox, taskId) {
@@ -222,30 +272,40 @@
                 // Refresh calendar to update event colors
                 document.querySelector('#calendar .fc-view').__fullCalendar.refetchEvents();
             }
-        });
+        })
+        .catch(error => console.error('Error:', error));
     }
 
     function editTask(taskId) {
         fetch(`/task/${taskId}`)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
         .then(task => {
             document.getElementById('modalTitle').textContent = 'Edit Task';
             document.getElementById('formTaskId').value = task.id;
-            document.getElementById('taskName').value = task.task_name;
-            
+            document.getElementById('task_name').value = task.task_name;
+
             const formatDate = (dateStr) => {
                 const date = new Date(dateStr);
                 const pad = num => num.toString().padStart(2, '0');
                 return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
             };
-            
-            document.getElementById('startDate').value = formatDate(task.assigned_date);
-            document.getElementById('dueDate').value = formatDate(task.due_date);
-            
+
+            document.getElementById('start_date').value = formatDate(task.assigned_date);
+            document.getElementById('due_date').value = formatDate(task.due_date);
+
             document.getElementById('taskForm').action = `/update-task/${taskId}`;
-            
+
             const modal = new bootstrap.Modal(document.getElementById('taskModal'));
             modal.show();
+        })
+        .catch(error => {
+            console.error('Error fetching task:', error);
+            alert('Failed to load task details');
         });
     }
 
@@ -253,7 +313,7 @@
         document.getElementById('deleteTaskName').textContent = taskName;
         const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
         deleteModal.show();
-        
+
         document.getElementById('confirmDeleteBtn').onclick = function() {
             fetch(`/delete-task/${taskId}`, {
                 method: 'POST',
@@ -265,7 +325,13 @@
             .then(response => {
                 if (response.ok) {
                     window.location.reload();
+                } else {
+                    throw new Error('Delete failed');
                 }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to delete task');
             });
         };
     }

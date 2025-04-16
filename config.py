@@ -1,5 +1,7 @@
 import os
 from dotenv import load_dotenv
+SQLALCHEMY_DATABASE_URI = 'sqlite:///instance/project.db'
+SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 load_dotenv()
 
