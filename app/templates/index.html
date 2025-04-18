@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 {% block title %}Dashboard - Scrappy Scheduler{% endblock %}
 
 {% block extra_css %}
@@ -58,6 +58,7 @@
             </button>
         </div>
 
+        <!-- Task List Template -->
         <div class="list-group">
             {% for task in tasks %}
             <div class="list-group-item task-item d-flex justify-content-between align-items-center {% if task.is_completed %}completed-task{% endif %}"
@@ -145,7 +146,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    {{ form.submit(class="btn btn-primary") }}
+                    <button type="submit" class="btn btn-primary">Save Task</button>
                 </div>
             </form>
         </div>
@@ -176,164 +177,182 @@
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize calendar
-        const calendarEl = document.getElementById('calendar');
-        const calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-            headerToolbar: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay'
-            },
-            events: [
-                {% for task in tasks %}
-                {
-                    title: '{{ task.task_name }}',
-                    start: '{{ task.due_date.isoformat() }}',
-                    extendedProps: {
-                        taskId: {{ task.id }}
-                    },
-                    color: '{% if task.is_completed %}#6c757d{% else %}#0d6efd{% endif %}'
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize calendar
+    const calendarEl = document.getElementById('calendar');
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        events: [
+            {% for task in tasks %}
+            {
+                title: '{{ task.task_name }}',
+                start: '{{ task.due_date.isoformat() }}',
+                extendedProps: {
+                    taskId: {{ task.id }}
                 },
-                {% endfor %}
-            ],
-            eventClick: function(info) {
-                const taskId = info.event.extendedProps.taskId;
-                editTask(taskId);
+                color: '{% if task.is_completed %}#6c757d{% else %}#0d6efd{% endif %}'
+            },
+            {% endfor %}
+        ],
+        eventClick: function(info) {
+            const taskId = info.event.extendedProps.taskId;
+            editTask(taskId);
+        }
+    });
+    calendar.render();
+
+    // Set up modal event listener for setting default dates
+    const taskModal = document.getElementById('taskModal');
+    taskModal.addEventListener('show.bs.modal', function() {
+        if (!document.getElementById('formTaskId').value) {
+            const now = new Date();
+            const timezoneOffset = now.getTimezoneOffset() * 60000;
+            const localISOTime = (new Date(now - timezoneOffset)).toISOString().slice(0, 16);
+
+            const startDateField = document.getElementById('start_date');
+            const dueDateField = document.getElementById('due_date');
+
+            if (startDateField && dueDateField) {
+                startDateField.value = localISOTime;
+                dueDateField.value = localISOTime;
             }
-        });
-        calendar.render();
-
-        // Set up modal event listener for setting default dates
-        const taskModal = document.getElementById('taskModal');
-        taskModal.addEventListener('show.bs.modal', function() {
-            // Only set defaults when adding new task (not when editing)
-            if (!document.getElementById('formTaskId').value) {
-                const now = new Date();
-                const timezoneOffset = now.getTimezoneOffset() * 60000;
-                const localISOTime = (new Date(now - timezoneOffset)).toISOString().slice(0, 16);
-
-                const startDateField = document.getElementById('start_date');
-                const dueDateField = document.getElementById('due_date');
-
-                if (startDateField && dueDateField) {
-                    startDateField.value = localISOTime;
-                    dueDateField.value = localISOTime;
-                }
-            }
-        });
-
-        // Form submission handler
-        document.getElementById('taskForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            try {
-                const response = await fetch(this.action, {
-                    method: 'POST',
-                    body: new FormData(this),
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-CSRFToken': document.querySelector('[name="csrf_token"]').value
-                    }
-                });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    window.location.reload();
-                } else {
-                    const errorDiv = document.getElementById('error-message');
-                    errorDiv.textContent = result.error || Object.values(result.errors).join('\n');
-                    errorDiv.classList.remove('d-none');
-                    errorDiv.scrollIntoView({ behavior: 'smooth' });
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Failed to submit form');
-            }
-        });
+        }
     });
 
-    function toggleTaskComplete(checkbox, taskId) {
-        fetch(`/update-task/${taskId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
-            },
-            body: `is_completed=${checkbox.checked}`
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const taskItem = checkbox.closest('.task-item');
-                taskItem.classList.toggle('completed-task', checkbox.checked);
-                // Refresh calendar to update event colors
-                document.querySelector('#calendar .fc-view').__fullCalendar.refetchEvents();
+    // Form submission handler
+    document.getElementById('taskForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const formData = {
+            task_name: document.getElementById('task_name').value,
+            start_date: document.getElementById('start_date').value,
+            due_date: document.getElementById('due_date').value,
+            csrf_token: document.querySelector('[name="csrf_token"]').value
+        };
+
+        try {
+            const response = await fetch(this.action, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': formData.csrf_token
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                window.location.reload();
+            } else {
+                const errorDiv = document.getElementById('error-message');
+                errorDiv.textContent = result.message || Object.values(result.errors).join('\n');
+                errorDiv.classList.remove('d-none');
+                errorDiv.scrollIntoView({ behavior: 'smooth' });
             }
-        })
-        .catch(error => console.error('Error:', error));
-    }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Failed to submit form. Check console for details.');
+        }
+    });
+}); // ← this was incorrectly indented before
+
+function toggleTaskComplete(checkbox, taskId) {
+    fetch(`/update-task/${taskId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+        },
+        body: `is_completed=${checkbox.checked}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const taskItem = checkbox.closest('.task-item');
+            taskItem.classList.toggle('completed-task', checkbox.checked);
+            document.querySelector('#calendar .fc-view').__fullCalendar.refetchEvents();
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
 
     function editTask(taskId) {
         fetch(`/task/${taskId}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(task => {
-            document.getElementById('modalTitle').textContent = 'Edit Task';
-            document.getElementById('formTaskId').value = task.id;
-            document.getElementById('task_name').value = task.task_name;
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(data => {
+                if (!data.success) {
+                    throw new Error(data.error || 'Failed to load task');
+                }
 
-            const formatDate = (dateStr) => {
-                const date = new Date(dateStr);
-                const pad = num => num.toString().padStart(2, '0');
-                return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
-            };
+                const task = data.task;
+                document.getElementById('modalTitle').textContent = 'Edit Task';
+                document.getElementById('formTaskId').value = task.id;
+                document.getElementById('task_name').value = task.task_name;
 
-            document.getElementById('start_date').value = formatDate(task.assigned_date);
-            document.getElementById('due_date').value = formatDate(task.due_date);
+                // Format dates for datetime-local inputs
+                const formatDate = (dateString) => {
+                    return dateString.slice(0, 16); // Converts ISO to datetime-local format
+                };
 
-            document.getElementById('taskForm').action = `/update-task/${taskId}`;
+                document.getElementById('start_date').value = formatDate(task.start_date);
+                document.getElementById('due_date').value = formatDate(task.due_date);
+                document.getElementById('taskForm').action = `/update-task/${task.id}`;
 
-            const modal = new bootstrap.Modal(document.getElementById('taskModal'));
-            modal.show();
-        })
-        .catch(error => {
-            console.error('Error fetching task:', error);
-            alert('Failed to load task details');
-        });
+                // Show the modal
+                const modal = new bootstrap.Modal(document.getElementById('taskModal'));
+                modal.show();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert(error.message || 'Failed to load task details');
+            });
     }
 
     function confirmDelete(taskId, taskName) {
         document.getElementById('deleteTaskName').textContent = taskName;
         const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
-        deleteModal.show();
 
-        document.getElementById('confirmDeleteBtn').onclick = function() {
+        // Clear previous click handlers
+        const confirmBtn = document.getElementById('confirmDeleteBtn');
+        confirmBtn.onclick = null;
+
+        // Set up new handler
+        confirmBtn.onclick = function () {
             fetch(`/delete-task/${taskId}`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name="csrf_token"]').value
                 }
             })
-            .then(response => {
-                if (response.ok) {
-                    window.location.reload();
-                } else {
-                    throw new Error('Delete failed');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Failed to delete task');
-            });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.reload();
+                    } else {
+                        alert(data.error || 'Failed to delete task');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while deleting the task');
+                })
+                .finally(() => {
+                    deleteModal.hide();
+                });
         };
+
+        deleteModal.show();
     }
+
 </script>
 {% endblock %}

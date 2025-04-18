@@ -16,13 +16,13 @@ class TaskForm(FlaskForm):
     )
     due_date = DateTimeLocalField('Due Date',
         format='%Y-%m-%dT%H:%M',
-        validators=[
-            DataRequired()
-        ],
+        validators=[DataRequired()],
         default=lambda: datetime.utcnow() + timedelta(hours=1)
     )
-    submit = SubmitField('Save Task')
+    
+    # Remove the submit field - you're using AJAX submission
+    # submit = SubmitField('Save Task')
 
     def validate_due_date(form, field):
-        if field.data < form.start_date.data:
+        if field.data and form.start_date.data and field.data < form.start_date.data:
             raise ValidationError('Due date must be after start date')

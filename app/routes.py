@@ -6,6 +6,8 @@ from app.models import Task, db
 from sqlalchemy.exc import SQLAlchemyError
 from html import escape
 from app.home.forms import TaskForm  # Add this import
+from flask_wtf.csrf import CSRFError
+
 
 home = Blueprint("home", __name__)
 
