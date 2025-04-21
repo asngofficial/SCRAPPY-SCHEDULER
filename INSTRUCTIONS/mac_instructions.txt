@@ -1,0 +1,120 @@
+# Setting Up Scrappy Scheduler on macOS
+
+Based on the repository structure and your team's issues with dependencies, here's a step-by-step guide to get the Flask application running on macOS:
+
+## Step 1: Install Prerequisites
+
+1. **Install Python 3.12** (matches the Windows environment):
+   ```bash
+   brew install python@3.12
+   ```
+
+2. **Install pip** (should come with Python):
+   ```bash
+   python3.12 -m ensurepip --upgrade
+   ```
+
+## Step 2: Set Up Virtual Environment
+
+1. Navigate to your project directory:
+   ```bash
+   cd path/to/ScrappyScheduler
+   ```
+
+2. Create a new virtual environment (don't use the Windows one):
+   ```bash
+   python3.12 -m venv venv
+   ```
+
+3. Activate the virtual environment:
+   ```bash
+   source venv/bin/activate
+   ```
+
+## Step 3: Install Dependencies
+
+1. Install the requirements from the `requirements.txt` file:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. If you encounter version conflicts, try:
+   ```bash
+   pip install --upgrade pip setuptools wheel
+   pip install -r requirements.txt --use-deprecated=legacy-resolver
+   ```
+
+## Step 4: Set Up Environment Variables
+
+1. Create/edit the `.env` file with necessary configurations:
+   ```bash
+   cp .env.example .env  # If you have an example file
+   nano .env
+   ```
+
+2. Typical Flask environment variables needed:
+   ```
+   FLASK_APP=run.py
+   FLASK_ENV=development
+   SECRET_KEY=your-secret-key-here
+   ```
+
+## Step 5: Initialize Database
+
+1. Set up the database migrations:
+   ```bash
+   flask db init
+   flask db migrate
+   flask db upgrade
+   ```
+
+## Step 6: Run the Application
+
+1. Start the Flask development server:
+   ```bash
+   flask run
+   ```
+
+2. Alternatively, you can run directly:
+   ```bash
+   python run.py
+   ```
+
+## Alternative Solutions for Team Members
+
+If dependency issues persist:
+
+### Option 1: Use Docker
+Create a `Dockerfile` and `docker-compose.yml` to standardize the environment.
+
+### Option 2: Try Pipenv
+```bash
+pip install pipenv
+pipenv install -r requirements.txt
+pipenv shell
+flask run
+```
+
+### Option 3: Manual Dependency Resolution
+If specific packages conflict:
+```bash
+pip install package1==version1 package2==version2
+```
+
+## Troubleshooting Common Issues
+
+1. **Missing Dependencies**:
+   ```bash
+   pip install flask flask-sqlalchemy flask-migrate flask-login flask-wtf python-dotenv
+   ```
+
+2. **Database Issues**:
+   - Delete the `instance/project.db` and migration folders
+   - Re-run `flask db init`, `migrate`, and `upgrade`
+
+3. **Port Already in Use**:
+   ```bash
+   flask run --port 5001
+   ```
+
+The application should now be accessible at `http://localhost:5000` in your browser.
