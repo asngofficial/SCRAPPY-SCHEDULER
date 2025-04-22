@@ -1,6 +1,8 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from itsdangerous import URLSafeTimedSerializer
+from flask import current_app
 from .extensions import db
 
 class User(db.Model, UserMixin):
@@ -11,6 +13,8 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    reset_token = db.Column(db.String(32), index=True, unique=True)
+    reset_token_expiration = db.Column(db.DateTime)
     tasks = db.relationship('Task', back_populates='user', cascade='all, delete-orphan', lazy='dynamic')
 
     def set_password(self, password):
@@ -18,6 +22,23 @@ class User(db.Model, UserMixin):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    def get_reset_token(self, expires_sec=1800):
+        s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+        self.reset_token = s.dumps({'user_id': self.id})
+        self.reset_token_expiration = datetime.utcnow() + timedelta(seconds=expires_sec)
+        db.session.add(self)
+        db.session.commit()
+        return self.reset_token
+
+    @staticmethod
+    def verify_reset_token(token):
+        s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+        try:
+            user_id = s.loads(token, max_age=1800)['user_id']
+        except:
+            return None
+        return User.query.get(user_id)
 
     def __repr__(self):
         return f'<User {self.username}>'

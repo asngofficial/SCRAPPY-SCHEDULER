@@ -1,14 +1,14 @@
 from flask import render_template, redirect, url_for, flash, request
-from flask_login import login_user, current_user
+from flask_login import login_user, current_user, logout_user, login_required
 from werkzeug.urls import url_parse
-from .forms import LoginForm
-from app.models import User
+from datetime import datetime, timedelta
+import secrets
+import string
 from . import bp
+from .forms import LoginForm, RegistrationForm, ForgotPasswordForm, ResetPasswordForm
+from app.models import User
 from app.extensions import db
-from datetime import datetime
-from app.email import send_password_reset_email 
-from .forms import LoginForm, RegistrationForm  # Add RegistrationForm to imports
-from flask_login import logout_user, login_required
+from app.email import send_password_reset_email
 
 @bp.route('/logout')
 @login_required
@@ -45,13 +45,12 @@ def forgot_password():
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user:
-            # Generate a reset token (expires in 1 hour)
-            reset_token = ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(32))
+            # Generate a secure random token
+            reset_token = secrets.token_urlsafe(32)
             user.reset_token = reset_token
-            user.reset_token_expires = datetime.utcnow() + timedelta(hours=1)
+            user.reset_token_expiration = datetime.utcnow() + timedelta(hours=1)
             db.session.commit()
             
-            # Send email (we'll implement this next)
             send_password_reset_email(user)
             
             flash('Check your email for instructions to reset your password', 'info')
@@ -67,7 +66,9 @@ def reset_password(token):
         logout_user()
     
     user = User.query.filter_by(reset_token=token).first()
-    if not user or user.reset_token_expires < datetime.utcnow():
+    
+    # Fix: Changed reset_token_expires to reset_token_expiration
+    if not user or user.reset_token_expiration < datetime.utcnow():
         flash('Invalid or expired token', 'danger')
         return redirect(url_for('auth.forgot_password'))
     
@@ -75,14 +76,13 @@ def reset_password(token):
     if form.validate_on_submit():
         user.set_password(form.password.data)
         user.reset_token = None
-        user.reset_token_expires = None
+        user.reset_token_expiration = None  # Fix: Changed to expiration
         db.session.commit()
         
         flash('Your password has been reset. You can now login.', 'success')
         return redirect(url_for('auth.login'))
     
     return render_template('auth/reset_password.html', title='Reset Password', form=form)
-
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
