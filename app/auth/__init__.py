@@ -1,6 +1,6 @@
 from flask import Blueprint
 from flask_login import LoginManager
-from app.extensions import login_manager
+from app.extensions import login_manager, db, mail, migrate, csrf
 from app.models import User
 
 # Initialize blueprint
