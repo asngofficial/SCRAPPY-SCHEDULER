@@ -10,7 +10,9 @@ config.py
 .DS_Store
 Thumbs.db
 *.log
+project.db
 
 
 
+instance/project.db
 instance/project.db
