@@ -7,6 +7,10 @@ from sqlalchemy.exc import SQLAlchemyError
 from html import escape
 from app.home.forms import TaskForm  # Add this import
 
+
+from app.email import send_notification_email
+
+
 home = Blueprint("home", __name__)
 
 def validate_task_input(task_name, start_date_str, due_date_str):
@@ -48,33 +52,62 @@ def add_task():
     print("Add task endpoint hit")  # Debug
     form = TaskForm()
     
-    if not form.validate_on_submit():
-        print("Form validation failed:", form.errors)  # Debug
-        return jsonify({
-            "success": False,
-            "errors": form.errors
-        }), 400
+    # if not form.validate_on_submit():
+    #     print("Form validation failed:", form.errors)  # Debug
+    #     return jsonify({
+    #         "success": False,
+    #         "errors": form.errors
+    #     }), 400
 
-    try:
-        print("Creating task...")  # Debug
+    # try:
+    #     print("Creating task...")  # Debug
+    #     task = Task(
+    #         task_name=form.task_name.data,
+    #         start_date=form.start_date.data,
+    #         due_date=form.due_date.data,
+    #         user_id=current_user.id
+    #     )
+    #     db.session.add(task)
+    #     db.session.commit()
+    #     print("Task saved successfully")  # Debug
+
+    if form.validate_on_submit():
+        print("✅ Form is valid")
+
         task = Task(
-            task_name=form.task_name.data,
+            title=form.title.data,
+            description=form.description.data,
             start_date=form.start_date.data,
             due_date=form.due_date.data,
             user_id=current_user.id
         )
         db.session.add(task)
         db.session.commit()
-        print("Task saved successfully")  # Debug
-        return jsonify({"success": True})
+
+        flash("Task created!", "success")
+        return redirect(url_for("main.index"))
         
-    except Exception as e:
-        db.session.rollback()
-        print("Error saving task:", str(e))  # Debug
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
+    send_notification_email(
+        current_user.email,
+        "🗓️ New Task Added",
+        f"Hi {current_user.username},\n\nYour task '{task.title}' has been added to Scrappy Scheduler!"
+    )
+    flash("Task created and email sent!")
+
+        # return jsonify({"success": True})
+
+    print("❌ Form validation failed")
+    print("Errors:", form.errors)
+    flash("Form failed: " + str(form.errors), "danger")
+    return redirect(url_for("main.index"))
+        
+    # except Exception as e:
+    #     db.session.rollback()
+    #     print("Error saving task:", str(e))  # Debug
+    #     return jsonify({
+    #         "success": False,
+    #         "error": str(e)
+    #     }), 500
 
 @home.route("/delete/<int:task_id>", methods=["POST"])
 @login_required

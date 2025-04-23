@@ -55,31 +55,51 @@ def get_tasks():
 
 @bp.route('/add-task', methods=['POST'])
 @login_required
+# def add_task():
+#     form = TaskForm()
+#     if form.validate_on_submit():
+#         try:
+#             task = Task(
+#                 task_name=escape(form.task_name.data.strip()),
+#                 due_date=form.due_date.data,
+#                 user_id=current_user.id,
+#                 is_completed=False
+#             )
+            
+#             db.session.add(task)
+#             db.session.commit()
+#             flash('Task added successfully!', 'success')
+#             return redirect(url_for('home.index'))
+        
+#         except (SQLAlchemyError, BadRequest):
+#             db.session.rollback()
+#             flash('Failed to add task. Please try again.', 'error')
+#     else:
+#         for field, errors in form.errors.items():
+#             for error in errors:
+#                 flash(f"{getattr(form, field).label.text}: {error}", 'error')
+    
+#     return redirect(url_for('home.index'))
+
 def add_task():
     form = TaskForm()
+
     if form.validate_on_submit():
-        try:
-            task = Task(
-                task_name=escape(form.task_name.data.strip()),
-                due_date=form.due_date.data,
-                user_id=current_user.id,
-                is_completed=False
-            )
-            
-            db.session.add(task)
-            db.session.commit()
-            flash('Task added successfully!', 'success')
-            return redirect(url_for('home.index'))
-        
-        except (SQLAlchemyError, BadRequest):
-            db.session.rollback()
-            flash('Failed to add task. Please try again.', 'error')
-    else:
-        for field, errors in form.errors.items():
-            for error in errors:
-                flash(f"{getattr(form, field).label.text}: {error}", 'error')
-    
-    return redirect(url_for('home.index'))
+        task = Task(
+            task_name=form.task_name.data,
+            start_date=form.start_date.data,
+            due_date=form.due_date.data,
+            user_id=current_user.id
+        )
+        db.session.add(task)
+        db.session.commit()
+
+        return jsonify(success=True)
+
+    print("Task form validation failed")
+    print(form.errors)
+
+    return jsonify(success=False, errors=form.errors), 400
 
 @bp.route('/update-task/<int:task_id>', methods=['POST'])
 @login_required

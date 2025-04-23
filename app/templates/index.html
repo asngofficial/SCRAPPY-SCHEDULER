@@ -121,7 +121,7 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             {{ form.start_date.label(class="form-label") }}
-                            {{ form.start_date(class="form-control", id="start_date") }}
+                            {{ form.start_date(class="form-control", id="start_date", type="datetime-local") }}
                             {% if form.start_date.errors %}
                             <div class="invalid-feedback d-block">
                                 {% for error in form.start_date.errors %}
@@ -132,7 +132,7 @@
                         </div>
                         <div class="col-md-6">
                             {{ form.due_date.label(class="form-label") }}
-                            {{ form.due_date(class="form-control", id="due_date") }}
+                            {{ form.due_date(class="form-control", id="due_date", type="datetime-local") }}
                             {% if form.due_date.errors %}
                             <div class="invalid-feedback d-block">
                                 {% for error in form.due_date.errors %}
