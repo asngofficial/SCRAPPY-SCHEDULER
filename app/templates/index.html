@@ -54,22 +54,18 @@
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h2>My Tasks</h2>
             <div>
-                <!-- Modals are located in script.js-->
-
                 <!-- Notify Me Button -->
                 <button class="btn btn-primary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#notifyModal">
                     <i class="bi bi-bell-fill"></i> Notify Me
                 </button>
-
                 <!-- Add Task Button -->
-                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#taskModal"> 
+                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#taskModal">
                     <i class="bi bi-plus"></i> Add Task
                 </button>
             </div>
         </div>
-    </div>
 
-        <!-- Task List Template -->
+        <!-- Task List Template - MOVED INSIDE task-list div -->
         <div class="list-group">
             {% for task in tasks %}
             <div class="list-group-item task-item d-flex justify-content-between align-items-center {% if task.is_completed %}completed-task{% endif %}"
@@ -98,8 +94,7 @@
             </div>
             {% endfor %}
         </div>
-    </div>
-
+    </div> <!-- Close task-list div -->
     <!-- Calendar View -->
     <div class="calendar-view">
         <div id="calendar"></div>

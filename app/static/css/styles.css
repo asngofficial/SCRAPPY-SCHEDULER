@@ -282,3 +282,7 @@ footer {
 ::-webkit-scrollbar-thumb:hover {
     background: var(--green-hover);
 }
+
+.task-list {
+    background-color: transparent !important;
+}
