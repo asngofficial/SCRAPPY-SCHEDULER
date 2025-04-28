@@ -1,4 +1,22 @@
-2025-04-23 11:27:19,025 ERROR: Exception on / [GET] [in /Users/joshuatran/SCRAPPY-SCHEDULER/venv/lib/python3.12/site-packages/flask/app.py:1414]
+2025-04-23 11:26:53,278 ERROR: Exception on /favicon.ico [GET] [in /Users/joshuatran/SCRAPPY-SCHEDULER/venv/lib/python3.12/site-packages/flask/app.py:1414]
+Traceback (most recent call last):
+  File "/Users/joshuatran/SCRAPPY-SCHEDULER/venv/lib/python3.12/site-packages/flask/app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joshuatran/SCRAPPY-SCHEDULER/venv/lib/python3.12/site-packages/flask/app.py", line 1458, in dispatch_request
+    self.raise_routing_exception(req)
+  File "/Users/joshuatran/SCRAPPY-SCHEDULER/venv/lib/python3.12/site-packages/flask/app.py", line 1440, in raise_routing_exception
+    raise request.routing_exception  # type: ignore
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joshuatran/SCRAPPY-SCHEDULER/venv/lib/python3.12/site-packages/flask/ctx.py", line 353, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joshuatran/SCRAPPY-SCHEDULER/venv/lib/python3.12/site-packages/werkzeug/routing/map.py", line 655, in match
+    raise NotFound() from None
+werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+
+During handling of the above exception, another exception occurred:
+
 Traceback (most recent call last):
   File "/Users/joshuatran/SCRAPPY-SCHEDULER/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
     self.dialect.do_execute(
@@ -15,24 +33,26 @@ Traceback (most recent call last):
   File "/Users/joshuatran/SCRAPPY-SCHEDULER/venv/lib/python3.12/site-packages/flask/app.py", line 1486, in full_dispatch_request
     rv = self.handle_user_exception(e)
          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/joshuatran/SCRAPPY-SCHEDULER/venv/lib/python3.12/site-packages/flask/app.py", line 1484, in full_dispatch_request
-    rv = self.dispatch_request()
-         ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/joshuatran/SCRAPPY-SCHEDULER/venv/lib/python3.12/site-packages/flask/app.py", line 1469, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/joshuatran/SCRAPPY-SCHEDULER/venv/lib/python3.12/site-packages/flask_login/utils.py", line 284, in decorated_view
-    elif not current_user.is_authenticated:
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/joshuatran/SCRAPPY-SCHEDULER/venv/lib/python3.12/site-packages/werkzeug/local.py", line 311, in __get__
-    obj = instance._get_current_object()
-          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/joshuatran/SCRAPPY-SCHEDULER/venv/lib/python3.12/site-packages/werkzeug/local.py", line 515, in _get_current_object
-    return get_name(local())
-                    ^^^^^^^
-  File "/Users/joshuatran/SCRAPPY-SCHEDULER/venv/lib/python3.12/site-packages/flask_login/utils.py", line 25, in <lambda>
-    current_user = LocalProxy(lambda: _get_user())
-                                      ^^^^^^^^^^^
+  File "/Users/joshuatran/SCRAPPY-SCHEDULER/venv/lib/python3.12/site-packages/flask/app.py", line 1341, in handle_user_exception
+    return self.handle_http_exception(e)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joshuatran/SCRAPPY-SCHEDULER/venv/lib/python3.12/site-packages/flask/app.py", line 1281, in handle_http_exception
+    return self.ensure_sync(handler)(e)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joshuatran/SCRAPPY-SCHEDULER/app/__init__.py", line 90, in not_found_error
+    return render_template('errors/404.html'), 404
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joshuatran/SCRAPPY-SCHEDULER/venv/lib/python3.12/site-packages/flask/templating.py", line 151, in render_template
+    return _render(app, template, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joshuatran/SCRAPPY-SCHEDULER/venv/lib/python3.12/site-packages/flask/templating.py", line 128, in _render
+    app.update_template_context(context)
+  File "/Users/joshuatran/SCRAPPY-SCHEDULER/venv/lib/python3.12/site-packages/flask/app.py", line 737, in update_template_context
+    context.update(func())
+                   ^^^^^^
+  File "/Users/joshuatran/SCRAPPY-SCHEDULER/venv/lib/python3.12/site-packages/flask_login/utils.py", line 407, in _user_context_processor
+    return dict(current_user=_get_user())
+                             ^^^^^^^^^^^
   File "/Users/joshuatran/SCRAPPY-SCHEDULER/venv/lib/python3.12/site-packages/flask_login/utils.py", line 372, in _get_user
     current_app.login_manager._load_user()
   File "/Users/joshuatran/SCRAPPY-SCHEDULER/venv/lib/python3.12/site-packages/flask_login/login_manager.py", line 364, in _load_user
@@ -91,3 +111,4 @@ FROM users
 WHERE users.id = ?]
 [parameters: (2,)]
 (Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-04-23 11:27:15,099 INFO: Application startup [in /Users/joshuatran/SCRAPPY-SCHEDULER/app/__init__.py:82]
