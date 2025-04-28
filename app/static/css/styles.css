@@ -1,6 +1,13 @@
 /* Import Outfit font */
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap');
 
+/* Bootstrap Theme Override */
+:root {
+    --bs-primary: #77D777;
+    --bs-primary-rgb: 119, 215, 119;
+    --bs-primary-hover: #66c566;
+}
+
 /* Variables */
 :root {
     --green: #77D777;
@@ -11,6 +18,9 @@
     --bg-input: #333333;
     --border-input: #555;
     --shadow: rgba(119, 215, 119, 0.2);
+    --transition: all 0.3s ease;
+    --border-radius: 12px;
+    --card-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 /* Reset & Global */
@@ -24,33 +34,73 @@ body {
     font-family: 'Outfit', sans-serif;
     background-color: var(--bg-dark);
     color: var(--text-white);
+    line-height: 1.6;
 }
 
 /* Navbar */
 .navbar {
     background-color: var(--green) !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 1rem 0;
+    transition: var(--transition);
 }
 
-.navbar-brand,
+.navbar-brand {
+    color: var(--text-white) !important;
+    font-weight: 600;
+    font-size: 1.5rem;
+    letter-spacing: 0.5px;
+}
+
+.navbar-brand img {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+    transition: var(--transition);
+}
+
+.navbar-brand:hover img {
+    transform: scale(1.05);
+}
+
+.navbar-toggler {
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.navbar-toggler:focus {
+    box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 0.8)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
 .nav-link {
     color: var(--text-white) !important;
     font-weight: 500;
+    padding: 0.5rem 1rem !important;
+    border-radius: 8px;
+    transition: var(--transition);
 }
 
 .nav-link:hover {
-    text-decoration: underline;
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
 }
 
 /* Headings */
 h1, h2, h3, h4, h5 {
     color: var(--green);
     font-weight: 600;
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.5px;
 }
 
 /* Main content spacing */
 main.container {
     margin-top: 2rem;
     margin-bottom: 2rem;
+    padding: 2rem;
 }
 
 /* Task List Styles */
@@ -63,39 +113,43 @@ main.container {
 
 .task-list {
     background-color: var(--bg-card);
-    border-radius: 1rem;
+    border-radius: var(--border-radius);
     padding: 1.5rem;
     overflow-y: auto;
     max-height: 100%;
-    box-shadow: 0 4px 12px var(--shadow);
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .list-group-item {
     background-color: var(--bg-dark);
     color: var(--text-white);
     border: 1px solid var(--border-input);
-    border-radius: 0.5rem;
+    border-radius: var(--border-radius);
     margin-bottom: 10px;
     padding: 1rem;
-    transition: all 0.2s ease-in-out;
+    transition: var(--transition);
 }
 
 .task-item:hover {
     background-color: #2f2f2f;
     transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .completed-task {
     opacity: 0.6;
     text-decoration: line-through;
+    background-color: rgba(119, 215, 119, 0.1);
 }
 
 /* Inputs and Forms */
 .form-container {
     background-color: var(--bg-card);
     padding: 2rem;
-    border-radius: 1rem;
-    box-shadow: 0 4px 12px var(--shadow);
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 input.form-control,
@@ -104,7 +158,9 @@ textarea.form-control {
     background-color: var(--bg-input);
     border: 1px solid var(--border-input);
     color: var(--text-white);
-    border-radius: 0.5rem;
+    border-radius: var(--border-radius);
+    padding: 0.75rem 1rem;
+    transition: var(--transition);
 }
 
 input.form-control:focus,
@@ -112,6 +168,7 @@ select.form-control:focus,
 textarea.form-control:focus {
     border-color: var(--green);
     box-shadow: 0 0 0 0.2rem rgba(119, 215, 119, 0.25);
+    transform: translateY(-1px);
 }
 
 /* Buttons */
@@ -120,37 +177,68 @@ textarea.form-control:focus {
     border-color: var(--green);
     color: var(--text-white);
     font-weight: 500;
-    border-radius: 0.5rem;
+    border-radius: var(--border-radius);
+    padding: 0.75rem 1.5rem;
+    transition: var(--transition);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .btn-primary:hover {
     background-color: var(--green-hover);
     border-color: var(--green-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(119, 215, 119, 0.3);
 }
 
 .btn-outline-secondary,
 .btn-outline-danger {
-    border-radius: 0.5rem;
+    border-radius: var(--border-radius);
+    padding: 0.75rem 1.5rem;
+    transition: var(--transition);
 }
 
 .btn-outline-secondary:hover,
 .btn-outline-danger:hover {
-    opacity: 0.85;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 /* Modal */
 .modal-content {
     background-color: var(--bg-card);
     color: var(--text-white);
-    border-radius: 1rem;
+    border-radius: var(--border-radius);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: var(--card-shadow);
 }
 
-/* Footer (if any) */
+.modal-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Footer */
 footer {
     background-color: #111;
     color: var(--text-white);
-    padding: 1rem;
+    padding: 2rem;
     text-align: center;
+    margin-top: auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.task-item, .form-container, .modal-content {
+    animation: fadeIn 0.3s ease-out;
 }
 
 /* Responsive */
@@ -162,4 +250,35 @@ footer {
     .task-list {
         height: auto;
     }
+    .navbar-brand {
+        font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .navbar-brand {
+        font-size: 1.25rem;
+    }
+    
+    .navbar-brand img {
+        height: 30px;
+    }
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--green);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--green-hover);
 }
