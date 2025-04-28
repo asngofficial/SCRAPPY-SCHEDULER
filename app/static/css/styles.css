@@ -3,14 +3,14 @@
 
 /* Bootstrap Theme Override */
 :root {
-    --bs-primary: #77D777;
+    --bs-primary: #00853E;
     --bs-primary-rgb: 119, 215, 119;
     --bs-primary-hover: #66c566;
 }
 
 /* Variables */
 :root {
-    --green: #77D777;
+    --green: #00853E;
     --green-hover: #66c566;
     --text-white: #ffffff;
     --bg-dark: #1e1e1e;
